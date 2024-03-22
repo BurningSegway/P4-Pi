@@ -18,7 +18,7 @@ from mavsdk import System
 
 counter = 0
 
-#TIhi fnis
+#Tihi fnis
 
 # Test set of manual inputs. Format: [roll, pitch, throttle, yaw]
 manual_inputs = [
@@ -94,8 +94,9 @@ async def manual_controls():
         counter = counter + 1
 
         await asyncio.sleep(0.1)
-    asyncio.cancel()
+
 
 if __name__ == "__main__":
     # Run the asyncio loop
     asyncio.run(manual_controls())
+    print("vildt nok!!!")
