@@ -18,7 +18,7 @@ class MinimalSubscriber(Node):
         self.master = mavutil.mavlink_connection("/dev/ttyACM0", baud=57600)
         # Wait a heartbeat before sending commands
         self.master.wait_heartbeat()
-        print("Heartbeat heart!")
+        print("--- Heartbeat heart!")
 
         self.master.mav.command_long_send(
             self.master.target_system,
@@ -28,9 +28,9 @@ class MinimalSubscriber(Node):
             1, 0, 0, 0, 0, 0, 0)
         
         # wait until arming confirmed (can manually check with master.motors_armed())
-        print("Waiting for the vehicle to arm")
+        print("--- Waiting for the vehicle to arm")
         self.master.motors_armed_wait()
-        print('Armed!')
+        print('--- Armed!')
 
         self.pitch = 0
         self.roll = 0
@@ -74,7 +74,7 @@ class MinimalSubscriber(Node):
 
         # wait until disarming confirmed
         self.master.motors_disarmed_wait()
-        print("Disarmed!")
+        print("--- Disarmed!")
 
 
 
@@ -83,12 +83,14 @@ def main(args=None):
 
     control_listener = MinimalSubscriber()
 
-    rclpy.spin(control_listener)
+    try:
+        rclpy.spin(control_listener)
+    except:
+        control_listener.drone_shutdown()
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    control_listener.drone_shutdown()
     control_listener.destroy_node()
     rclpy.shutdown()
 
