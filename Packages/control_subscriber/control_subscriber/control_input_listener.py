@@ -37,8 +37,12 @@ class MinimalSubscriber(Node):
         self.throttle = 0
         self.yaw = 0
 
+        self.time = self.get_clock().now()
+        self.recv_time = self.time.nanoseconds
+
     def listener_callback(self, msg):
 
+        self.recv_time = msg.stamp
         self.pitch = msg.pitch
         self.roll = msg.roll
         self.throttle = msg.throttle
@@ -47,13 +51,28 @@ class MinimalSubscriber(Node):
         self.get_logger().info(f"Control input recieved: \n Roll: {self.roll}\t Pitch: {self.pitch}\t Throttle: {self.throttle}\t Yaw: {self.yaw}")
 
     def execute_commands(self):
-        self.master.mav.manual_control_send(
+
+        self.time = self.get_clock().now()
+        time_diff = self.time.nanoseconds - self.recv_time
+        if time_diff < 400000000:
+            self.master.mav.manual_control_send(
+                self.master.target_system,
+                int(self.pitch),         #pitch
+                int(self.roll),          #roll
+                int(self.throttle),      #throttle
+                int(self.yaw),           #yaw
+                0)
+
+        else:
+            self.master.mav.manual_control_send(
             self.master.target_system,
-            int(self.pitch),         #pitch
-            int(self.roll),          #roll
-            int(self.throttle),      #throttle
-            int(self.yaw),           #yaw
+            0,
+            0,
+            0,
+            0,
             0)
+            raise SystemExit
+
     def drone_shutdown(self):
         self.master.mav.manual_control_send(
             self.master.target_system,
@@ -85,13 +104,15 @@ def main(args=None):
 
     try:
         rclpy.spin(control_listener)
-    except:
+    except KeyboardInterrupt:
+        control_listener.drone_shutdown()
+    except SystemExit:
         control_listener.drone_shutdown()
 
     # Destroy the node explicitly
     # (optional - otherwise it will be done automatically
     # when the garbage collector destroys the node object)
-    control_listener.destroy_node()
+    #control_listener.destroy_node()
     rclpy.shutdown()
 
 

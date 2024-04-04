@@ -20,7 +20,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'listener = control_subscriber.control_input_listener:main'
+            'listener = control_subscriber.control_input_listener:main',
+            'listener_simple = control_subscriber.control_input_listener_simple:main'
         ],
     },
 )
