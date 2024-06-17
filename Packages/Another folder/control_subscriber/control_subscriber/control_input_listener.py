@@ -12,7 +12,7 @@ class MinimalSubscriber(Node):
         self.subscription = self.create_subscription(Control, 'control_input', self.listener_callback, 10)
         self.subscription  # prevent unused variable warning
 
-        time_execute = 0.1
+        time_execute = 0.01
         self.timer_execute = self.create_timer(time_execute, self.execute_commands)
 
         self.master = mavutil.mavlink_connection("/dev/ttyACM0", baud=57600)
